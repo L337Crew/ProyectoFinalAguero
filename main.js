@@ -8,15 +8,13 @@ class Producto {
     }
   }
   
-  
-  const producto1 = new Producto(1, 'IntelCore-I7', 70000, 1);
-  const producto2 = new Producto(2, 'AmdRyzen-9', 75000, 1);
-  const producto3 = new Producto(3, 'IntelCore-I5', 60000, 1);
-  const producto4 = new Producto(4, 'AmdRyzen-5', 50000, 1);
+  const producto1 = new Producto(1, 'IntelCore-I7', 179, 1);
+  const producto2 = new Producto(2, 'AmdRyzen-9', 191, 1);
+  const producto3 = new Producto(3, 'IntelCore-I5', 153, 1);
+  const producto4 = new Producto(4, 'AmdRyzen-5', 127, 1);
   
   const productos = [producto1, producto2, producto3, producto4];
-  
-  
+   
   const contenedorProductos = document.getElementById('contenedorProductos');
   
   productos.forEach((producto) => {
@@ -27,7 +25,7 @@ class Producto {
                                 <img src="img/${producto.id}.jpg" class="card-img-top img-fluid py-3">
                                 <div class="card-body">
                                     <h3 class="card-title"> ${producto.nombre} </h3>
-                                    <p class="card-text"> ${producto.precio} </p>
+                                    <p class="card-text"> ${producto.precio} USD </p>
                                     <button id="boton${producto.id}" class="btn btn-success"> Agregar al Carrito </button>
                                 </div>
                             </div>`;
@@ -36,13 +34,18 @@ class Producto {
     const boton = document.getElementById(`boton${producto.id}`);
     boton.addEventListener('click', () => {
       agregarAlCarrito(producto.id);
+      Swal.fire({
+        position: 'top-end',
+        icon: 'success',
+        title: 'Producto agregado al carrito',
+        showConfirmButton: false,
+        timer: 1000
+      })
     });
   });
   
-  
   const carrito = [];
   
- 
   const agregarAlCarrito = (id) => {
     const producto = productos.find((producto) => producto.id === id);
     const productoEnCarrito = carrito.find((producto) => producto.id === id);
@@ -53,7 +56,6 @@ class Producto {
     }
     actualizarCarrito();
   };
-  
   
   const contenedorCarrito = document.getElementById('contenedorCarrito');
   
@@ -76,20 +78,41 @@ class Producto {
     calcularTotalCompra();
   }
   
-  
   const eliminarDelCarrito = (id) => {
     const producto = carrito.find((producto) => producto.id === id);
     carrito.splice(carrito.indexOf(producto), 1);
     actualizarCarrito();
+    Swal.fire({
+      position: 'top-end',
+      icon: 'error',
+      title: 'Producto quitado del carrito',
+      showConfirmButton: false,
+      timer: 1000
+    })
   };
-  
   
   const vaciarCarrito = document.getElementById('vaciarCarrito');
   vaciarCarrito.addEventListener('click', () => {
-    carrito.splice(0, carrito.length);
-    actualizarCarrito();
+    Swal.fire({
+      title: 'Estas por vaciar el carrito',
+        text: "Estas seguro?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Si, vacialo!',
+      cancelButtonText: 'No, cancelalo!',
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        carrito.splice(0, carrito.length);
+      actualizarCarrito();  
+        Swal.fire(
+          'Hecho!',
+          'El carrito se vacio.',
+          'success'
+        ) 
+      } 
+    }) 
   });
-  
   
   const totalCompra = document.getElementById('totalCompra');
   
@@ -100,3 +123,20 @@ class Producto {
     });
     totalCompra.innerHTML = total;
   };
+
+  const criptoYa = "https://criptoya.com/api/dolar";
+
+  let precioDolar = document.getElementById("precioDolar");
+
+  setInterval( () => {
+    fetch(criptoYa)
+     .then(response => response.json())
+     .then(({blue, oficial}) => {
+        precioDolar.innerHTML = `
+        <h2>Precio del dolar: </h2>
+        <p>DOLAR OFICIAL: ${oficial}</p>
+        <p>DOLAR BLUE: ${blue}</p>
+      `
+    })
+    .catch(error => console.error(error))
+  }, 5000 )
